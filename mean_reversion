@@ -1,0 +1,19 @@
+#This strategy is based on the idea that asset prices will revert to their historical mean over time.
+
+import pandas as pd
+import numpy as np
+
+# Sample data
+data = pd.read_csv('historical_price_data.csv', index_col='Date', parse_dates=True)
+
+# Calculate rolling mean and standard deviation
+data['mean'] = data['Close'].rolling(window=20).mean()
+data['std'] = data['Close'].rolling(window=20).std()
+
+# Define buy and sell signals
+data['z_score'] = (data['Close'] - data['mean']) / data['std']
+data['buy_signal'] = np.where(data['z_score'] < -1, 1, 0)
+data['sell_signal'] = np.where(data['z_score'] > 1, -1, 0)
+
+# Print signals
+print(data[['Close', 'mean', 'std', 'z_score', 'buy_signal', 'sell_signal']])

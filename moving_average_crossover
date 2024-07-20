@@ -1,0 +1,27 @@
+import pandas as pd
+import numpy as np
+import matplotlib.pyplot as plt
+
+# Load your data
+# Assuming you have a DataFrame `df` with a datetime index and a 'Close' price column
+
+# Calculate moving averages
+df['SMA50'] = df['Close'].rolling(window=50).mean()
+df['SMA200'] = df['Close'].rolling(window=200).mean()
+
+# Plot the data
+plt.figure(figsize=(12,6))
+plt.plot(df['Close'], label='Close Price')
+plt.plot(df['SMA50'], label='50-Day SMA')
+plt.plot(df['SMA200'], label='200-Day SMA')
+plt.legend()
+plt.show()
+
+# Detecting crossovers
+df['Signal'] = 0.0
+df['Signal'][50:] = np.where(df['SMA50'][50:] > df['SMA200'][50:], 1.0, 0.0)
+df['Position'] = df['Signal'].diff()
+
+# Print signals
+print(df[df['Position'] == 1].index)  # Buy signals
+print(df[df['Position'] == -1].index) # Sell signals

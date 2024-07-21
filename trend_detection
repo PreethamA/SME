@@ -1,0 +1,20 @@
+from sklearn.linear_model import LinearRegression
+
+def detect_trend(prices, window=30):
+    trends = []
+    for i in range(window, len(prices)):
+        x = np.arange(window).reshape(-1, 1)
+        y = prices[i-window:i].values.reshape(-1, 1)
+        model = LinearRegression().fit(x, y)
+        trend = model.coef_[0][0]
+        trends.append(trend)
+    return pd.Series(trends, index=prices.index[window:])
+
+df['Trend'] = detect_trend(df['Close'])
+
+# Plot the trend
+plt.figure(figsize=(12,6))
+plt.plot(df['Close'], label='Close Price')
+plt.plot(df['Trend'], label='Trend')
+plt.legend()
+plt.show()

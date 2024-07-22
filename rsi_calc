@@ -1,0 +1,36 @@
+import pandas as pd
+import numpy as np
+import matplotlib.pyplot as plt
+import yfinance as yf
+
+# Fetch historical data
+ticker = 'AAPL'
+data = yf.download(ticker, start='2020-01-01', end='2023-01-01')
+
+# Calculate RSI
+def calculate_RSI(data, window=14):
+    delta = data['Close'].diff()
+    gain = (delta.where(delta > 0, 0)).rolling(window=window).mean()
+    loss = (-delta.where(delta < 0, 0)).rolling(window=window).mean()
+    RS = gain / loss
+    RSI = 100 - (100 / (1 + RS))
+    return RSI
+
+data['RSI'] = calculate_RSI(data)
+
+# Drop NaN values
+data = data.dropna()
+
+# Plot the data
+plt.figure(figsize=(14,7))
+plt.subplot(2, 1, 1)
+plt.plot(data['Close'], label='Close Price')
+plt.title(f'{ticker} Price and RSI')
+plt.legend()
+
+plt.subplot(2, 1, 2)
+plt.plot(data['RSI'], label='RSI', color='orange')
+plt.axhline(70, linestyle='--', alpha=0.5, color='red')
+plt.axhline(30, linestyle='--', alpha=0.5, color='green')
+plt.legend()
+plt.show()
